@@ -11,7 +11,7 @@ if __name__ == "__main__":
         if task.class_id == "download":
             execute = Utility.time_diff(datetime.now(),datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%S.000Z"))
             #REMOVE THIS IN PROD
-            execute = True
+            #execute = True
             if execute and task.enabled:
                 print('Executing Task No.%s - %s' % (task.id, task.task_name))
                 task.dataDownload()

@@ -9,6 +9,7 @@ from controller_server_path import PathManager
 from dateutil.relativedelta import relativedelta
 import calendar
 from copernicusmarine import subset
+import numpy as np
 
 class Utility:
     @staticmethod
@@ -260,3 +261,33 @@ class Utility:
         lastSunday = Utility.get_last_sunday(new_date_time_months.year, new_date_time_months.month)
 
         return "%s.%s" % (lastSunday.strftime("%Y%m%d"), "nc")
+    
+    @staticmethod
+    def reproject_netcdf(ds, old_path, new_path):
+        try:
+            subset = xr.open_dataset(old_path)
+            lon, lat = "", ""
+            #CHECK IF DIMENSIONS ARE CORRECT
+            for dim_name, dim in subset.dims.items():
+                origname = dim_name.strip()
+                tolower = origname.lower()
+                if 'lon' in tolower:
+                    lon = tolower
+                if 'lat' in tolower:
+                    lat = tolower
+            
+            
+            #CHECK IF LON BETWEEN 0 TO 360
+            below_zero = (subset[lon] > 180).any().values
+
+            if below_zero:
+                print('converting from 0-360 to -180-180')
+                lons = np.asarray(subset[lon].values)
+                lons = (lons + 180) % 360 - 180
+                subset[lon] = lons
+                subset  = xr.decode_cf(ds )
+                subset.to_netcdf(path=new_path ,mode='w',format='NETCDF4',  engine='netcdf4')
+            
+            return True
+        except Exception as e:
+            return False

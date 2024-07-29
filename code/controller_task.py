@@ -169,6 +169,10 @@ class taskController(task):
                     Utility.copy_file(PathManager.get_url('tmp',self.next_download_file), local_dir)
                     Utility.remove_file(PathManager.get_url('tmp',self.next_download_file))
                 
+                #REPROJECT FROM 0-360 to -180-180
+                old_path = "%s/%s" % (local_dir, self.next_download_file)
+                Utility.reproject_netcdf(ds,old_path,old_path )
+
                 #CREATE LATEST
                 if ds.create_latest:
                     Utility.copy_file("%s/%s" % (local_dir, self.next_download_file),"%s/%s" % (local_dir, "latest.nc"))
@@ -231,6 +235,10 @@ class taskController(task):
                     Utility.copy_file(PathManager.get_url('tmp',self.next_download_file), local_dir)
                     Utility.remove_file(PathManager.get_url('tmp',self.next_download_file))
                 
+                #REPROJECT FROM 0-360 to -180-180
+                old_path = "%s/%s" % (local_dir, self.next_download_file)
+                Utility.reproject_netcdf(ds,old_path,old_path )
+                
                 #CREATE LATEST
                 if ds.create_latest:
                     Utility.copy_file("%s/%s" % (local_dir, self.next_download_file),"%s/%s" % (local_dir, "latest.nc"))
@@ -280,6 +288,9 @@ class taskController(task):
                 new_file_name,download_directory)
             
             if get_data:
+                #REPROJECT FROM 0-360 to -180-180
+                old_path = "%s/%s" % (download_directory, new_file_name)
+                Utility.reproject_netcdf(ds,old_path,old_path )
                 #CREATE LATEST
                 if ds.create_latest:
                     Utility.copy_file("%s/%s" % (download_directory, new_file_name),"%s/%s" % (download_directory, "latest.nc"))
