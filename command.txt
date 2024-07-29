@@ -1,0 +1,5 @@
+docker build -t ocean-data . 
+
+docker run -v /home/pop/Desktop/ocean-portal2.0/backend_design:/scripts \
+-v /home/pop/ocean_portal/datasets:/home/pop/ocean_portal/datasets \
+-ti --rm ocean-data -c 'python /scripts/main.py'
