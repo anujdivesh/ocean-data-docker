@@ -291,3 +291,23 @@ class Utility:
             return True
         except Exception as e:
             return False
+    @staticmethod
+    def download_obdaac(url, local_filename):
+        try:
+        # Send a GET request to the URL
+            with requests.get(url, stream=True, timeout=120) as response:
+                # Check if the request was successful
+                response.raise_for_status()
+                # Open a local file with the desired name
+                with open(local_filename, 'wb') as file:
+                    # Write the content to the file in chunks
+                    #file.write(response.content)
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            file.write(chunk)
+            print(f"File downloaded as {local_filename}")
+            return True
+        except Exception as e:
+            print(e)
+            return False
+            print('File not found.')

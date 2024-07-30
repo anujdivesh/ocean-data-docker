@@ -201,15 +201,34 @@ class taskController(task):
             #REPLACE WITH FILE TO DOWNLOAD
             url = url.replace('{download_file_name}', self.next_download_file)
 
-            #REPLACE PYTHON PATH
-            url = url.replace('{path_to_file}', PathManager.get_url('odbaac'))
+            #CHECK
+            substrings_to_remove = [ds.download_file_prefix, ds.download_file_suffix]
+            new_string = Utility.remove_substrings(self.next_download_file, substrings_to_remove)
+            newstr = new_string
+            infixstr = ds.download_file_infix
+            if "_" in new_string:
+                newsplot = new_string.split("_")
+                infix_split = ds.download_file_infix.split('_')
+                newstr =  newsplot[0]
+                infixstr = infix_split[0]
+            convert_to_datetime = datetime.strptime(newstr, infixstr)
+            
+            #CHECK FOR YEAR
+            if "{year}" in url:
+                url = url.replace('{year}', convert_to_datetime.strftime('%Y'))
+            #CHECK FOR MONTH
+            if "{month}" in url:
+                url = url.replace('{month}', convert_to_datetime.strftime('%m'))
+            
+            #CHECK FOR DAY
+            if "{day}" in url:
+                url = url.replace('{day}', convert_to_datetime.strftime('%d'))
 
-            #REPLACE DIRECTORY PATH
-            url = url.replace('{local_directory_path}', PathManager.get_url('tmp'))
-
-            #TRY TO DOWNLOAD
-            result = subprocess.run(url, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             print(url)
+            
+            #DOWNLOAD FILE
+            result = Utility.download_obdaac(url,PathManager.get_url('tmp',self.next_download_file))            
+            
             if os.path.exists("%s/%s" % (PathManager.get_url('tmp'),self.next_download_file)):
                 #RENAME TO TMP IN THE SAME DIR
                 tmp_name = "%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_tmp.nc")
