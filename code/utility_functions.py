@@ -159,7 +159,8 @@ class Utility:
                 "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "next_download_file":new_file_name,
                 "last_download_file":task.next_download_file,
-                "success_count":task.success_count + 1
+                "success_count":task.success_count + 1,
+                "health":"Excellent"
             }
             Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
             print('File download successful!')
@@ -169,7 +170,8 @@ class Utility:
             data = {
                 "next_run_time":update_time,
                 "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "attempt_count":task.attempt_count + 1
+                "attempt_count":task.attempt_count + 1,
+                "health":"Poor"
             }
             Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
 
@@ -178,7 +180,8 @@ class Utility:
             data = {
                     "next_run_time":update_time,
                     "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "fail_count":task.fail_count + 1
+                    "fail_count":task.fail_count + 1,
+                    "health":"Failed"
             }
             Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
             print('Download Failed')
