@@ -171,7 +171,7 @@ class Utility:
                 "next_run_time":update_time,
                 "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "attempt_count":task.attempt_count + 1,
-                "health":"Poor"
+                "health":"Good"
             }
             Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
 
