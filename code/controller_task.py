@@ -342,7 +342,7 @@ class taskController(task):
         self.create_product_directory(ds)
 
         #SET TO RUNNING
-        Utility.update_api(PathManager.get_url('ocean-api','task_download',str(self.id)+"/"), {"health":"Running"})
+        Utility.update_api(PathManager.get_url('ocean-api','task_download',str(self.id)+"/"), {"health":"Running", "attempt_count":"0"})
         
         if ds.download_method == 1:
             print('download with https')
