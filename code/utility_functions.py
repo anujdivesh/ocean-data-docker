@@ -165,7 +165,7 @@ class Utility:
                 "success_count":task.success_count + 1,
                 "health":"Excellent"
             }
-            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
+            Utility.update_api(PathManager.get_url('ocean-api','task_download',str(task.id))+"/", data)
             print('File download successful!')
         else:
             print('File does not exist, try again later')
@@ -176,7 +176,7 @@ class Utility:
                 "attempt_count":task.attempt_count + 1,
                 "health":"Poor"
             }
-            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
+            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id))+"/", data)
 
         if is_error:
             update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%SZ"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
@@ -186,7 +186,7 @@ class Utility:
                     "fail_count":task.fail_count + 1,
                     "health":"Failed"
             }
-            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
+            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id))+"/", data)
             print('Download Failed')
         pass
     
