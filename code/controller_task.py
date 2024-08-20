@@ -54,7 +54,7 @@ class taskController(task):
         else:
             if ds.download_file_infix.strip() == "":
                 new_file_name = self.next_download_file
-                prepare_new_time = datetime.strptime(self.next_run_time, "%Y-%m-%dT%H:%M:%S.000Z")
+                prepare_new_time = datetime.strptime(self.next_run_time, "%Y-%m-%dT%H:%M:%SZ")
                 new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
 
             else:
@@ -68,13 +68,18 @@ class taskController(task):
                     convert_to_datetime = datetime.strptime(date_split[0], infix_split[0])
                     prepare_new_time = Utility.add_time(convert_to_datetime,ds.frequency_months,ds.frequency_days, ds.frequency_hours,ds.frequency_minutes)
                     
-                    if ds.download_method.strip() == "copernicusmarine":
+                    if ds.download_method == 3:
                         new_file_name = ds.download_file_prefix + "" +prepare_new_time.strftime(infix_split[0]) +"_"+prepare_new_time.strftime(infix_split[1])+ ds.download_file_suffix
                         new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
-                    else: 
+                    elif ds.download_method == 2: 
                         first_day,last_day = Utility.get_first_last_day_of_month(prepare_new_time.year, prepare_new_time.month)
                         new_file_name = ds.download_file_prefix + "" +first_day.strftime(infix_split[0]) +"_"+last_day.strftime(infix_split[1])+ ds.download_file_suffix
                         new_download_time = Utility.add_time(first_day,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
+                    else:
+                        convert_to_datetime = datetime.strptime(new_string, ds.download_file_infix)
+                        prepare_new_time = Utility.add_time(convert_to_datetime,ds.frequency_months,ds.frequency_days, ds.frequency_hours,ds.frequency_minutes)
+                        new_file_name = ds.download_file_prefix + "" +prepare_new_time.strftime(ds.download_file_infix) + ds.download_file_suffix
+                        new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
 
                 else:
                     print("normal datetime")
@@ -324,7 +329,10 @@ class taskController(task):
 
     def dataDownload(self):
         #GET DATASET
-        dataset_url = "https://dev-oceanportal.spc.int/v1/api/dataset/%s" % (self.dataset_id)
+        url= PathManager.get_url('ocean-api','dataset')
+        #dataset_url = "https://dev-oceanportal.spc.int/v1/api/dataset/%s" % (self.dataset_id)
+        dataset_url = "%s/%s" % (url,self.dataset_id)
+        print(dataset_url)
         ds = initialize_datasetController(dataset_url)
 
         #CHECK IF FILE EXISTS AND DOWNLOAD
@@ -334,15 +342,15 @@ class taskController(task):
         self.create_product_directory(ds)
 
         #SET TO RUNNING
-        Utility.update_api(PathManager.get_url('ocean-api','task',str(self.id)), {"health":"Running"})
+        Utility.update_api(PathManager.get_url('ocean-api','task_download',str(self.id)+"/"), {"health":"Running"})
         
-        if ds.download_method == "http":
+        if ds.download_method == 1:
             print('download with https')
             download_succeed, is_error = self.download_http(ds)
-        elif ds.download_method == "obdaac_download":
+        elif ds.download_method == 2:
             print('downloading with obdaac..')
             download_succeed, is_error = self.download_obdaac(ds)
-        elif ds.download_method == "copernicusmarine":
+        elif ds.download_method == 3:
             print('downloading with copernicusmarine..')
             download_succeed, is_error = self.download_copernicusmarine(ds)
         else:
@@ -350,8 +358,8 @@ class taskController(task):
         
         #COMPULSORY THINGS TO DO, UPDATE THE API
         new_file_name,new_download_time = self.generate_next_download_filename(ds)
-        #print(new_file_name,new_download_time)
-        Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
+        print(new_file_name,new_download_time)
+        #Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
         
         print('data download completed.')
 

@@ -37,11 +37,11 @@ def initialize_datasetController(url):
     response = requests.get(url)
     if response.status_code == 200:
         item = response.json()
-        dataset = datasetController(item['id'],item['short_name'].strip(), item['long_name'].strip(),item['type'].strip(), item['data_provider'].strip(),item['data_source_url'].strip(),\
-                                item['data_download_url'].strip(),item['login_credentials_required'],item['username'].strip(),item['password'].strip(),\
-                                item['API_key'].strip(),item['download_method'].strip(),item['download_file_prefix'].strip(),item['download_file_infix'].strip(),\
+        dataset = datasetController(item['id'],item['short_name'].strip(), item['long_name'].strip(),item['data_type'], item['data_provider'].strip(),item['data_source_url'].strip(),\
+                                item['data_download_url'].strip(),item['login_credentials_required'],item['username'],item['password'],\
+                                item['API_key'],item['download_method'],item['download_file_prefix'].strip(),item['download_file_infix'].strip(),\
                                     item['download_file_suffix'].strip(),item['download_file_type'].strip(),item['download_to_local_dir'],\
-                                        item['local_directory_path'].strip(),item['scp'],item['scp_server_path'].strip(),item['frequency_minutes'],\
+                                        item['local_directory_path'].strip(),item['scp'],item['scp_server_path'],item['frequency_minutes'],\
                                             item['frequency_hours'],item['frequency_days'],item['frequency_months'],item['check_minutes'],\
                                                 item['check_hours'],item['check_days'],item['check_months'],item['has_variables'],str(item['variables']).strip(),\
                                             item['subset'],str(item['xmin_xmax']).strip(),str(item['ymin_ymax']).strip(),item['create_latest'], \

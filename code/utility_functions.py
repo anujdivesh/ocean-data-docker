@@ -26,7 +26,10 @@ class Utility:
     @staticmethod
     def update_api(url, data, headers=None):
         try:
-            response = requests.put(url, json=data, headers=headers)
+            response1 = requests.post(PathManager.get_url('ocean-api',"token/"),json={"username":"admin","password":"Oceanportal2017*"})
+            res1 = response1.json()
+            token=headers={"Authorization":"Bearer "+res1['access']}
+            response = requests.put(url, json=data, headers=token)
             response.raise_for_status()  # Raise an error for bad status codes
             return response.json()  # Return the response content as JSON
         except requests.exceptions.HTTPError as http_err:
@@ -166,17 +169,17 @@ class Utility:
             print('File download successful!')
         else:
             print('File does not exist, try again later')
-            update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%S.000Z"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
+            update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%SZ"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
             data = {
                 "next_run_time":update_time,
                 "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "attempt_count":task.attempt_count + 1,
-                "health":"Good"
+                "health":"Poor"
             }
             Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id)), data)
 
         if is_error:
-            update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%S.000Z"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
+            update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%SZ"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
             data = {
                     "next_run_time":update_time,
                     "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

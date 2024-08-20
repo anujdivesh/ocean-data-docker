@@ -5,7 +5,7 @@ class PathManager:
     base_dir = "/scripts"
     datasets = "/home/pop/ocean_portal/datasets"
     URLS = {
-        'ocean-api': 'https://dev-oceanportal.spc.int/v1/api',
+        'ocean-api': 'https://dev-oceanportal.spc.int/middleware/api',
         'tmp': base_dir+'/tmp',
         'odbaac': base_dir,
         'copernicus-credentials': base_dir+'/.copernicusmarine/.copernicusmarine-credentials',

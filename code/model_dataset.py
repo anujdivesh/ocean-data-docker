@@ -1,6 +1,6 @@
 
 class dataset:
-    def __init__(self, id, short_name, long_name, type,data_provider,data_source_url,data_download_url,login_credentials_required,username,\
+    def __init__(self, id, short_name, long_name, data_type,data_provider,data_source_url,data_download_url,login_credentials_required,username,\
                  password,API_key,download_method,download_file_prefix,download_file_infix,download_file_suffix,download_file_type,\
                     download_to_local_dir,local_directory_path,scp,scp_server_path,frequency_minutes,frequency_hours,frequency_days,frequency_months,\
                         check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,xmin_xmax,ymin_ymax,create_latest,\
@@ -8,7 +8,7 @@ class dataset:
         self.id = id
         self.short_name = short_name
         self.long_name = long_name
-        self.type = type
+        self.data_type = data_type
         self.data_provider = data_provider
         self.data_source_url = data_source_url
         self.data_download_url = data_download_url
