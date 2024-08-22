@@ -29,7 +29,8 @@ class Utility:
             response1 = requests.post(PathManager.get_url('ocean-api',"token/"),json={"username":"admin","password":"Oceanportal2017*"})
             res1 = response1.json()
             token=headers={"Authorization":"Bearer "+res1['access']}
-            response = requests.put(url, json=data, headers=token)
+            #print(token, data, url)
+            response = requests.put(url+"/", json=data, headers=token)
             response.raise_for_status()  # Raise an error for bad status codes
             return response.json()  # Return the response content as JSON
         except requests.exceptions.HTTPError as http_err:
@@ -120,7 +121,7 @@ class Utility:
                 xmin_xmax_arr = xmin_xmax.split(',')
                 ymin_ymax = ds.ymin_ymax.strip()
                 ymin_ymax_arr = ymin_ymax.split(',')
-                print(xmin_xmax_arr[0], xmin_xmax_arr[1], ymin_ymax_arr[0], ymin_ymax_arr[1])
+                #print(xmin_xmax_arr[0], xmin_xmax_arr[1], ymin_ymax_arr[0], ymin_ymax_arr[1])
                 if lon.lower() == "lon":
                     subset = subset.sel(lat=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])),\
                                     lon=slice(int(ymin_ymax_arr[0]), int(ymin_ymax_arr[1])))
@@ -165,7 +166,7 @@ class Utility:
                 "success_count":task.success_count + 1,
                 "health":"Excellent"
             }
-            Utility.update_api(PathManager.get_url('ocean-api','task_download',str(task.id))+"/", data)
+            Utility.update_api(PathManager.get_url('ocean-api','task_download',str(task.id)), data)
             print('File download successful!')
         else:
             print('File does not exist, try again later')
@@ -176,7 +177,7 @@ class Utility:
                 "attempt_count":task.attempt_count + 1,
                 "health":"Poor"
             }
-            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id))+"/", data)
+            Utility.update_api(PathManager.get_url('ocean-api','task_download',str(task.id)), data)
 
         if is_error:
             update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%SZ"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
@@ -186,7 +187,7 @@ class Utility:
                     "fail_count":task.fail_count + 1,
                     "health":"Failed"
             }
-            Utility.update_api(PathManager.get_url('ocean-api','task',str(task.id))+"/", data)
+            Utility.update_api(PathManager.get_url('ocean-api','task_download',str(task.id)), data)
             print('Download Failed')
         pass
     
@@ -214,7 +215,7 @@ class Utility:
             xmin_xmax_arr = xmin_xmax.split(',')
             ymin_ymax = ds.ymin_ymax.strip()
             ymin_ymax_arr = ymin_ymax.split(',')
-            print(xmin_xmax_arr[0], xmin_xmax_arr[1], ymin_ymax_arr[0], ymin_ymax_arr[1])
+            #print(xmin_xmax_arr[0], xmin_xmax_arr[1], ymin_ymax_arr[0], ymin_ymax_arr[1])
             subset(
             dataset_id=dataset_id,
             variables=varibales,
@@ -287,7 +288,7 @@ class Utility:
             below_zero = (subset[lon] > 180).any().values
 
             if below_zero:
-                print('converting from 0-360 to -180-180')
+                #print('converting from 0-360 to -180-180')
                 lons = np.asarray(subset[lon].values)
                 lons = (lons + 180) % 360 - 180
                 subset[lon] = lons

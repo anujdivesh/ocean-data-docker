@@ -342,7 +342,7 @@ class taskController(task):
         self.create_product_directory(ds)
 
         #SET TO RUNNING
-        Utility.update_api(PathManager.get_url('ocean-api','task_download',str(self.id)+"/"), {"health":"Running", "attempt_count":"0"})
+        Utility.update_api(PathManager.get_url('ocean-api','task_download',str(self.id)), {"health":"Running", "attempt_count":"0"})
         
         if ds.download_method == 1:
             print('download with https')
@@ -358,7 +358,8 @@ class taskController(task):
         
         #COMPULSORY THINGS TO DO, UPDATE THE API
         new_file_name,new_download_time = self.generate_next_download_filename(ds)
-        print(new_file_name,new_download_time)
+        #print(new_file_name,new_download_time)
+        #download_succeed, is_error = True, False
         Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
         
         print('data download completed.')
