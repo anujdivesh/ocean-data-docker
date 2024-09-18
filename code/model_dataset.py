@@ -3,7 +3,7 @@ class dataset:
     def __init__(self, id, short_name, long_name, data_type,data_provider,data_source_url,data_download_url,login_credentials_required,username,\
                  password,API_key,download_method,download_file_prefix,download_file_infix,download_file_suffix,download_file_type,\
                     download_to_local_dir,local_directory_path,scp,scp_server_path,frequency_minutes,frequency_hours,frequency_days,frequency_months,\
-                        check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,xmin_xmax,ymin_ymax,create_latest,\
+                        check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,convert_longitude,xmin_xmax,ymin_ymax,create_latest,\
                         force_forecast, force_days):
         self.id = id
         self.short_name = short_name
@@ -36,6 +36,7 @@ class dataset:
         self.has_variables = has_variables
         self.variables = variables
         self.subset = subset
+        self.convert_longitude = convert_longitude
         self.xmin_xmax = xmin_xmax
         self.ymin_ymax = ymin_ymax
         self.create_latest = create_latest

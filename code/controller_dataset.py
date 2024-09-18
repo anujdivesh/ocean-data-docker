@@ -6,12 +6,12 @@ class datasetController(dataset):
     def __init__(self, id, short_name, long_name, type,data_provider,data_source_url,data_download_url,login_credentials_required,username,\
                  password,API_key,download_method,download_file_prefix,download_file_infix,download_file_suffix,download_file_type,\
                     download_to_local_dir,local_directory_path,scp,scp_server_path,frequency_minutes,frequency_hours,frequency_days,frequency_months,\
-                        check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,xmin_xmax,ymin_ymax,create_latest,\
+                        check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,convert_longitude,xmin_xmax,ymin_ymax,create_latest,\
                         force_forecast, force_days):
         super().__init__(id, short_name, long_name, type,data_provider,data_source_url,data_download_url,login_credentials_required,username,\
                  password,API_key,download_method,download_file_prefix,download_file_infix,download_file_suffix,download_file_type,\
                     download_to_local_dir,local_directory_path,scp,scp_server_path,frequency_minutes,frequency_hours,frequency_days,frequency_months,\
-                        check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,xmin_xmax,ymin_ymax,create_latest,\
+                        check_minutes,check_hours,check_days,check_months,has_variables,variables,subset,convert_longitude,xmin_xmax,ymin_ymax,create_latest,\
                         force_forecast, force_days)
 
     def dataDownload(self):
@@ -44,7 +44,7 @@ def initialize_datasetController(url):
                                         item['local_directory_path'].strip(),item['scp'],item['scp_server_path'],item['frequency_minutes'],\
                                             item['frequency_hours'],item['frequency_days'],item['frequency_months'],item['check_minutes'],\
                                                 item['check_hours'],item['check_days'],item['check_months'],item['has_variables'],str(item['variables']).strip(),\
-                                            item['subset'],str(item['xmin_xmax']).strip(),str(item['ymin_ymax']).strip(),item['create_latest'], \
+                                            item['subset'],item['convert_longitude'],str(item['xmin_xmax']).strip(),str(item['ymin_ymax']).strip(),item['create_latest'], \
                                             item['force_forecast'],item['force_days'])
         return dataset
     else:

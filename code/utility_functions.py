@@ -42,7 +42,7 @@ class Utility:
     @staticmethod
     def url_exists(url):
         try:
-            response = requests.head(url)
+            response = requests.head(url,verify=False)
             # You can also use requests.get(url) if you need to access the content of the page
             if response.status_code == 200:
                 return True
@@ -56,7 +56,7 @@ class Utility:
     @staticmethod
     def download_large_file(url, destination):
         try:
-            with requests.get(url, stream=True) as response:
+            with requests.get(url, stream=True,verify=False) as response:
                 response.raise_for_status()
                 with open(destination, 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192):
@@ -239,15 +239,26 @@ class Utility:
 
     @staticmethod
     def get_last_sunday(year, month):
-        # Find the last day of the month
-        last_day_of_month = calendar.monthrange(year, month)[1]
-        last_date_of_month = datetime(year, month, last_day_of_month)
+        # Determine the first day of the next month
+        if month == 12:
+            next_month = 1
+            next_year = year + 1
+        else:
+            next_month = month + 1
+            next_year = year
         
-        # Find the last Sunday of the month
-        while last_date_of_month.weekday() != 6:  # 6 corresponds to Sunday
-            last_date_of_month -= timedelta(days=1)
+        # First day of the next month
+        first_day_next_month = datetime(next_year, next_month, 1)
         
-        return last_date_of_month
+        # Last day of the current month is one day before the first day of the next month
+        last_day_of_month = first_day_next_month - timedelta(days=1)
+        
+        # Calculate the last Sunday of the month
+        # If the last day of the month is Sunday (6), no need to change
+        days_to_last_sunday = (last_day_of_month.weekday() + 1) % 7
+        last_sunday = last_day_of_month - timedelta(days=days_to_last_sunday)
+        
+        return last_sunday
 
     @staticmethod
     def special_filename_coral_bleaching(prepare_new_time):

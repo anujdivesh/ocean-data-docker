@@ -12,6 +12,7 @@ if __name__ == "__main__":
             execute = Utility.time_diff(datetime.now(),datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%SZ"))
             #REMOVE THIS IN PROD
             #execute = True
-            if execute and task.enabled:
+            #if execute and task.enabled:
+            if task.id == 5:
                 print('Executing Task No.%s - %s' % (task.id, task.task_name))
                 task.dataDownload()

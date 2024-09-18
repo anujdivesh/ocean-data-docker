@@ -11,16 +11,18 @@ import os, sys
 import netCDF4
 import xarray as xr
 from copernicusmarine import subset
+from dateutil.relativedelta import relativedelta
+import calendar
 
 class taskController(task):
     def __init__(self, id, task_name, class_id, dataset_id,status,priority,\
                  duration,task_start_time,next_run_time,last_run_time,next_download_file,last_download_file,enabled,health,fail_count,\
                     success_count,reset_count,attempt_count,predecessor_class,predecessor_class_id,successor_class,successor_class_id,created_by,launched_by,\
-                        retain,retention_days):
+                        retain,retention_days,update_thredds,update_url_thredds,update_api_url):
         super().__init__( id, task_name, class_id, dataset_id,status,priority,\
                  duration,task_start_time,next_run_time,last_run_time,next_download_file,last_download_file,enabled,health,fail_count,\
                     success_count,reset_count,attempt_count,predecessor_class,predecessor_class_id,successor_class,successor_class_id,created_by,launched_by,\
-                        retain,retention_days)
+                        retain,retention_days,update_thredds,update_url_thredds,update_api_url)
     
     def generate_current_download_time(self,ds):
         convert_to_datetime = ""
@@ -43,6 +45,7 @@ class taskController(task):
         suffix = ds.download_file_suffix
         if "{special}" in suffix:
             print('Special file name generation...')
+            """
             substrings_to_remove = [ds.download_file_prefix, ".nc"]
             new_string = Utility.remove_substrings(self.next_download_file, substrings_to_remove)
             seperate = new_string.split("_")
@@ -50,6 +53,18 @@ class taskController(task):
             prepare_new_time = Utility.add_time(convert_to_datetime,ds.frequency_months,ds.frequency_days, ds.frequency_hours,ds.frequency_minutes)
             first_date, second_date = Utility.special_filename_coral_bleaching(prepare_new_time)
             new_file_name = ds.download_file_prefix+prepare_new_time.strftime('%Y%m%d')+"_for_"+first_date.strftime('%Y%m%d')+"to"+second_date.strftime('%Y%m%d')+".nc"
+            new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
+            """
+            print('Special file name generation...')
+            substrings_to_remove = [ds.download_file_prefix, ".nc"]
+            new_string = Utility.remove_substrings(self.next_download_file, substrings_to_remove)
+            seperate = new_string.split("_")
+            convert_to_datetime = datetime.strptime(seperate[0], ds.download_file_infix)
+            prepare_new_time = Utility.add_time(convert_to_datetime,0,7, 0,0)
+            second_date = prepare_new_time + timedelta(days=14)
+            thirddate = second_date + relativedelta(months=3)
+            last_sun = Utility.get_last_sunday(thirddate.year,thirddate.month)
+            new_file_name = ds.download_file_prefix+prepare_new_time.strftime('%Y%m%d')+"_for_"+second_date.strftime('%Y%m%d')+"to"+last_sun.strftime('%Y%m%d')+".nc"
             new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
         else:
             if ds.download_file_infix.strip() == "":
@@ -153,7 +168,7 @@ class taskController(task):
                 tmp_name = "%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_tmp.nc")
                 Utility.rename_file(PathManager.get_url('tmp',self.next_download_file), tmp_name)
                 
-                
+                """
                 #IF SUBSET OR VARIBLES
                 if ds.has_variables or ds.subset:
                     print('subsetting')
@@ -164,7 +179,9 @@ class taskController(task):
 
                 else:
                     Utility.rename_file(tmp_name,PathManager.get_url('tmp',self.next_download_file))
-                
+                """
+                Utility.rename_file(tmp_name,PathManager.get_url('tmp',self.next_download_file))
+
                 #MOVE FILES TO LOCAL OR SCP
                 local_dir = ds.local_directory_path
                 if ds.download_to_local_dir:
@@ -358,9 +375,9 @@ class taskController(task):
         
         #COMPULSORY THINGS TO DO, UPDATE THE API
         new_file_name,new_download_time = self.generate_next_download_filename(ds)
-        #print(new_file_name,new_download_time)
+        print(new_file_name,new_download_time)
         #download_succeed, is_error = True, False
-        Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
+        #Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
         
         print('data download completed.')
 
@@ -378,7 +395,8 @@ def initialize_taskController(url):
                                         item['enabled'],item['health'].strip(),item['fail_count'],item['success_count'],item['reset_count'],\
                                             item['attempt_count'],item['predecessor_class'],item['predecessor_class_id'],item['successor_class'],\
                                             item['successor_class_id'],\
-                                                item['created_by'].strip(),item['launched_by'].strip(),item['retain'],item['retention_days'])
+                                                item['created_by'].strip(),item['launched_by'].strip(),item['retain'],item['retention_days'],\
+                                                item['update_thredds'],item['update_url_thredds'],item['update_api_url'])
             enqueue.append(queue)
         return enqueue
     else:
