@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+<aggregation dimName="time" type="joinNew" recheckEvery="4 sec">
+ <variableAgg name="chlor_a"/>
+<remove name="palette" type="variable" />
+ <scan dateFormatMark="AQUA_MODIS.#yyyyMMdd" 
+       location="." 
+       suffix=".nc" subdirs="false"/>
+</aggregation>
+</netcdf>

@@ -87,6 +87,14 @@ class Utility:
         return subset_region
     
     @staticmethod
+    def get_variables(ds, old_path, new_path):
+        variab = xr.open_dataset(old_path)
+        varibles = ds.variables
+        variab = variab[varibles.split(",")]
+        variab.to_netcdf(path=new_path ,mode='w',format='NETCDF4',  engine='netcdf4')
+        
+
+    @staticmethod
     def subset_netcdf(ds, old_path, new_path):
         try:
             subset = xr.open_dataset(old_path)
@@ -100,22 +108,8 @@ class Utility:
                 if 'lat' in tolower:
                     lat = tolower
             
-            #CHHECK IF VARIBLES IS REQUIRED
-            if ds.has_variables:
-                varib = ds.variables
-                subset = subset[varib.split(",")]
-            
             #CHECK IF SUBSET IS REQUIRED
             if ds.subset:
-                #CHECK IF LON BETWEEN 0 TO 360
-                below_zero = (subset[lon] < 0).any().values
-                
-                if below_zero:
-                    first_part = subset.where(subset[lon] > 0, drop=True)
-                    part_to_remove = subset.where(subset[lon] < 0, drop=True)
-                    part_to_remove[lon] = (part_to_remove[lon] + 360) % 360
-                    subset = xr.concat([first_part, part_to_remove], dim=lon)
-                
                 #CONTINUE SUBSETTING
                 xmin_xmax = ds.xmin_xmax.strip()
                 xmin_xmax_arr = xmin_xmax.split(',')
@@ -123,11 +117,26 @@ class Utility:
                 ymin_ymax_arr = ymin_ymax.split(',')
                 #print(xmin_xmax_arr[0], xmin_xmax_arr[1], ymin_ymax_arr[0], ymin_ymax_arr[1])
                 if lon.lower() == "lon":
-                    subset = subset.sel(lat=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])),\
-                                    lon=slice(int(ymin_ymax_arr[0]), int(ymin_ymax_arr[1])))
+                    if ds.convert_longitude:
+                        subset = subset.sel(lat=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])),\
+                            lon=slice(int(ymin_ymax_arr[0]), int(ymin_ymax_arr[1])))
+                    else:
+                        latmax = int(ymin_ymax_arr[1]) - 360
+                        print(ymin_ymax_arr[0], latmax)
+                        subset_lat = subset.sel(lat=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])))
+                        subset_lon1 = subset_lat.sel(lon=slice(int(ymin_ymax_arr[0]), 180))
+                        subset_lon2 = subset_lat.sel(lon=slice(-180, latmax))
+                        subset = xr.concat([subset_lon1, subset_lon2], dim='lon')
                 else:
-                    subset = subset.sel(latitude=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])),\
-                                    longitude=slice(int(ymin_ymax_arr[0]), int(ymin_ymax_arr[1])))
+                    if ds.convert_longitude:
+                        subset = subset.sel(latitude=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])),\
+                            longitude=slice(int(ymin_ymax_arr[0]), int(ymin_ymax_arr[1])))
+                    else:
+                        latmax = int(ymin_ymax_arr[1]) - 360
+                        subset_lat = subset.sel(latitude=slice(int(xmin_xmax_arr[0]), int(xmin_xmax_arr[1])))
+                        subset_lon1 = subset_lat.sel(longitude=slice(ymin_ymax_arr[0], 180))
+                        subset_lon2 = subset_lat.sel(longitude=slice(-180, latmax))
+                        subset = xr.concat([subset_lon1, subset_lon2], dim='lon')
             
             #SAVE NEW NETCDF
             subset  = xr.decode_cf(subset )
@@ -298,13 +307,12 @@ class Utility:
             #CHECK IF LON BETWEEN 0 TO 360
             below_zero = (subset[lon] > 180).any().values
 
-            if below_zero:
-                #print('converting from 0-360 to -180-180')
-                lons = np.asarray(subset[lon].values)
-                lons = (lons + 180) % 360 - 180
-                subset[lon] = lons
-                subset  = xr.decode_cf(ds )
-                subset.to_netcdf(path=new_path ,mode='w',format='NETCDF4',  engine='netcdf4')
+            print('converting from 0-360 to -180-180')
+            lons = np.asarray(subset[lon].values)
+            lons = (lons + 180) % 360 - 180
+            subset[lon] = lons
+            subset  = xr.decode_cf(subset )
+            subset.to_netcdf(path=new_path ,mode='w',format='NETCDF4',  engine='netcdf4')
             
             return True
         except Exception as e:

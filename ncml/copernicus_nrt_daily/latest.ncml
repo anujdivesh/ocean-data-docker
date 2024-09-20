@@ -1,0 +1,5 @@
+<netcdf xmlns="http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2">
+  <aggregation dimName="time" type="joinExisting" recheckEvery="15 sec">
+    <scan location="." dateFormatMark="cmems_obs-sl_glo_phy-ssh_nrt_allsat-l4-duacs-0.25deg_P1D_#yyyyMMdd" suffix=".nc" subdirs="false" />
+  </aggregation>
+</netcdf>

@@ -67,7 +67,7 @@ class taskController(task):
             new_file_name = ds.download_file_prefix+prepare_new_time.strftime('%Y%m%d')+"_for_"+second_date.strftime('%Y%m%d')+"to"+last_sun.strftime('%Y%m%d')+".nc"
             new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
         else:
-            if ds.download_file_infix.strip() == "":
+            if ds.download_file_infix.strip() == "none":
                 new_file_name = self.next_download_file
                 prepare_new_time = datetime.strptime(self.next_run_time, "%Y-%m-%dT%H:%M:%SZ")
                 new_download_time = Utility.add_time(prepare_new_time,ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes)
@@ -167,20 +167,30 @@ class taskController(task):
                 #RENAME TO TMP IN THE SAME DIR
                 tmp_name = "%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_tmp.nc")
                 Utility.rename_file(PathManager.get_url('tmp',self.next_download_file), tmp_name)
-                
-                """
-                #IF SUBSET OR VARIBLES
-                if ds.has_variables or ds.subset:
-                    print('subsetting')
-                    output_file = "%s" % (PathManager.get_url('tmp',self.next_download_file))
-                    is_subsetted = Utility.subset_netcdf(ds, tmp_name, output_file)
-                    if not is_subsetted:
-                        Utility.rename_file(tmp_name,PathManager.get_url('tmp',self.next_download_file))
 
-                else:
+                #PATHS
+                tmp_path = tmp_name
+                new_name = "%s" % (PathManager.get_url('tmp',self.next_download_file))
+                
+                #IF VARIABLES
+                if ds.has_variables:
+                    print('getting variables...')
+                    Utility.get_variables(ds,tmp_path,new_name)
+                
+                #IF SUBSET
+                if ds.subset:
+                    print('subsetting...')
+                    is_subsetted = Utility.subset_netcdf(ds, tmp_path, new_name)
+
+                #IF CONVERT LON
+                #if ds.convert_longitude:
+                #    print('converting longitude....')
+                #    Utility.reproject_netcdf(ds,tmp_path,new_name )
+                
+                #IF NOTHING
+                if not ds.has_variables and not ds.subset and not ds.convert_longitude:
+                    print('nothing to do, moving file...')
                     Utility.rename_file(tmp_name,PathManager.get_url('tmp',self.next_download_file))
-                """
-                Utility.rename_file(tmp_name,PathManager.get_url('tmp',self.next_download_file))
 
                 #MOVE FILES TO LOCAL OR SCP
                 local_dir = ds.local_directory_path
@@ -190,12 +200,8 @@ class taskController(task):
                         local_dir = local_dir.replace("{root-dir}", root_dir)
                     Utility.copy_file(PathManager.get_url('tmp',self.next_download_file), local_dir)
                     Utility.remove_file(PathManager.get_url('tmp',self.next_download_file))
-                
-                #REPROJECT FROM 0-360 to -180-180
-                old_path = "%s/%s" % (local_dir, self.next_download_file)
-                Utility.reproject_netcdf(ds,old_path,old_path )
-
-                #CREATE LATEST
+            
+                #CREATE_LATEST
                 if ds.create_latest:
                     Utility.copy_file("%s/%s" % (local_dir, self.next_download_file),"%s/%s" % (local_dir, "latest.nc"))
 
@@ -255,7 +261,41 @@ class taskController(task):
                 #RENAME TO TMP IN THE SAME DIR
                 tmp_name = "%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_tmp.nc")
                 Utility.rename_file(PathManager.get_url('tmp',self.next_download_file), tmp_name)
+                #PATHS
+                tmp_path = tmp_name
+                new_name = "%s" % (PathManager.get_url('tmp',self.next_download_file))
+                
+                #IF VARIABLES
+                if ds.has_variables:
+                    print('getting variables...')
+                    Utility.get_variables(ds,tmp_path,new_name)
+                
+                #IF SUBSET
+                if ds.subset:
+                    print('subsetting...')
+                    is_subsetted = Utility.subset_netcdf(ds, tmp_path, new_name)
 
+                #IF NOTHING
+                if not ds.has_variables and not ds.subset and not ds.convert_longitude:
+                    print('nothing to do, moving file...')
+                    Utility.rename_file(tmp_name,PathManager.get_url('tmp',self.next_download_file))
+
+                #MOVE FILES TO LOCAL OR SCP
+                local_dir = ds.local_directory_path
+                if ds.download_to_local_dir:
+                    root_dir = PathManager.get_url('root-dir')
+                    if "{root-dir}" in local_dir:
+                        local_dir = local_dir.replace("{root-dir}", root_dir)
+                    Utility.copy_file(PathManager.get_url('tmp',self.next_download_file), local_dir)
+                    Utility.remove_file(PathManager.get_url('tmp',self.next_download_file))
+            
+                #CREATE_LATEST
+                if ds.create_latest:
+                    Utility.copy_file("%s/%s" % (local_dir, self.next_download_file),"%s/%s" % (local_dir, "latest.nc"))
+
+                #CLEANUP IF NEEDED, try
+                Utility.remove_file(tmp_name)
+                """
                 #IF SUBSET OR VARIBLES
                 if ds.has_variables or ds.subset:
                     print('subsetting')
@@ -286,6 +326,7 @@ class taskController(task):
 
                 #CLEANUP IF NEEDED, try
                 Utility.remove_file(tmp_name)
+                """
 
                 download_complete = True
             else:
@@ -377,7 +418,7 @@ class taskController(task):
         new_file_name,new_download_time = self.generate_next_download_filename(ds)
         print(new_file_name,new_download_time)
         #download_succeed, is_error = True, False
-        #Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
+        Utility.update_tasks(download_succeed, is_error, new_file_name,new_download_time,self,ds)
         
         print('data download completed.')
 
