@@ -20,8 +20,8 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
 
 WORKDIR /app
 
-COPY environment.yml /app/environment.yml
-RUN conda env create -n ocean -f /app/environment.yml
+COPY environment2.yml /app/environment2.yml
+RUN conda env create -n ocean -f /app/environment2.yml
 
 #RUN . /root/miniconda3/bin/activate && conda env update --name base --file /app/environment.yml
 

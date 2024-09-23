@@ -3,7 +3,7 @@ class task:
     def __init__(self, id, task_name, class_id, dataset_id,status,priority,\
                  duration,task_start_time,next_run_time,last_run_time,next_download_file,last_download_file,enabled,health,fail_count,\
                     success_count,reset_count,attempt_count,predecessor_class,predecessor_class_id,successor_class,successor_class_id,created_by,launched_by,\
-                        retain,retention_days,update_thredds,update_url_thredds,update_api_url):
+                        retain,retention_days):
         self.id = id
         self.task_name = task_name
         self.class_id = class_id
@@ -30,6 +30,3 @@ class task:
         self.launched_by = launched_by
         self.retain = retain
         self.retention_days = retention_days
-        self.update_thredds = update_thredds
-        self.update_url_thredds = update_url_thredds
-        self.update_api_url = update_api_url
