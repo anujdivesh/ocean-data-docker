@@ -175,12 +175,16 @@ class taskController(task):
                 #IF VARIABLES
                 if ds.has_variables:
                     print('getting variables...')
-                    Utility.get_variables(ds,tmp_path,new_name)
+                    Utility.get_variables(ds,tmp_path,"%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_varib.nc"))
                 
                 #IF SUBSET
                 if ds.subset:
-                    print('subsetting...')
-                    is_subsetted = Utility.subset_netcdf(ds, tmp_path, new_name)
+                    if ds.has_variables:
+                        print('subsetting with variables...')
+                        is_subsetted = Utility.subset_netcdf(ds, "%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_varib.nc"), new_name)
+                    else:
+                        print('subsetting...')
+                        is_subsetted = Utility.subset_netcdf(ds, tmp_path, new_name)
 
                 #IF CONVERT LON
                 #if ds.convert_longitude:
@@ -268,12 +272,16 @@ class taskController(task):
                 #IF VARIABLES
                 if ds.has_variables:
                     print('getting variables...')
-                    Utility.get_variables(ds,tmp_path,new_name)
+                    Utility.get_variables(ds,tmp_path,"%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_varib.nc"))
                 
                 #IF SUBSET
                 if ds.subset:
-                    print('subsetting...')
-                    is_subsetted = Utility.subset_netcdf(ds, tmp_path, new_name)
+                    if ds.has_variables:
+                        print('subsetting with variables...')
+                        is_subsetted = Utility.subset_netcdf(ds, "%s%s" % (PathManager.get_url('tmp',self.next_download_file), "_varib.nc"), new_name)
+                    else:
+                        print('subsetting...')
+                        is_subsetted = Utility.subset_netcdf(ds, tmp_path, new_name)
 
                 #IF NOTHING
                 if not ds.has_variables and not ds.subset and not ds.convert_longitude:
