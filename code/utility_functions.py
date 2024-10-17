@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 import calendar
 from copernicusmarine import subset
 import numpy as np
+import glob
 
 class Utility:
     @staticmethod
@@ -156,7 +157,7 @@ class Utility:
     @staticmethod
     def rename_file(old_name, new_name):
         try:
-            os.rename(old_name, new_name)
+            shutil.move(old_name, new_name)
         except FileNotFoundError:
             print(f"File '{old_name}' not found.")
         except Exception as e:
@@ -179,12 +180,16 @@ class Utility:
             print('File download successful!')
         else:
             print('File does not exist, try again later')
+            healthy = "Excellent"
+            currcount = task.attempt_count + 1
+            if currcount > 32:
+                healthy = "Poor"
             update_time = Utility.add_time(datetime.strptime(task.next_run_time,"%Y-%m-%dT%H:%M:%SZ"),ds.check_months,ds.check_days, ds.check_hours,ds.check_minutes).strftime("%Y-%m-%d %H:%M:%S")
             data = {
                 "next_run_time":update_time,
                 "last_run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "attempt_count":task.attempt_count + 1,
-                "health":"Poor"
+                "health":healthy
             }
             Utility.update_api(PathManager.get_url('ocean-api','task_download',str(task.id)), data)
 
@@ -337,3 +342,19 @@ class Utility:
             print(e)
             return False
             print('File not found.')
+
+    @staticmethod
+    def remove_files_by_extension(directory, extension):
+        # Create a pattern to match files with the specified extension
+        pattern = os.path.join(directory, f"*.{extension}")
+        
+        # Use glob to find all files matching the pattern
+        files_to_remove = glob.glob(pattern)
+        
+        # Loop through the files and remove each one
+        for file in files_to_remove:
+            try:
+                os.remove(file)
+                print(f"Removed: {file}")
+            except Exception as e:
+                print(f"Error removing {file}: {e}")

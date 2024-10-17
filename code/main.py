@@ -34,3 +34,5 @@ if __name__ == "__main__":
                 thredds.get_6hourly(x)
             elif period == 'OPENDAP':
                 thredds.get_specific_stamp(x)
+    #REMOVE empty nc's
+    Utility.remove_files_by_extension("/scripts/tmp","nc")

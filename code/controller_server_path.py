@@ -18,4 +18,3 @@ class PathManager:
         if key not in cls.URLS:
             raise ValueError(f"Invalid key '{key}'. Available keys: {list(cls.URLS.keys())}")
         return "/".join([cls.URLS[key]] + list(args))
-
